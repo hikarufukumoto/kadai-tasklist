@@ -46,8 +46,14 @@ class tasksController extends Controller
      */
         public function store(Request $request)
     {
+        $this->validate($request, [
+            'status' => 'required|max:10',   // add
+            'content' => 'required|max:191',
+        ]);
+
         $task = new Tasks;
         $task->content = $request->content;
+        $task->status = $request->status; 
         $task->save();
 
         return redirect('/');
