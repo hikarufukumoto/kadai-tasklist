@@ -10,7 +10,7 @@
         </tr>
         <tr>
             <th>タイトル</th>
-            <td>{{ $task->title }}</td>
+            <td>{{ $task->status }}</td>
         </tr>
         <tr>
             <th>メッセージ</th>
@@ -22,4 +22,5 @@
         {!! Form::submit('削除', ['class' => 'btn btn-danger']) !!}
     {!! Form::close() !!}
 @endsection
+
 
