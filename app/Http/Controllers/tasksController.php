@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 
-use App\Tasks;    
+use App\Task;    
 
 class tasksController extends Controller
 {
@@ -16,11 +16,19 @@ class tasksController extends Controller
      */
      public function index()
     {
-        $tasks = Tasks::all();
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+            return view('tasks.index', $data);
+        }else {
+            return view('welcome');
+        }
     }
 
 
@@ -31,7 +39,7 @@ class tasksController extends Controller
      */
     public function create()
     {
-         $task = new Tasks;
+         $task = new Task;
 
         return view('tasks.create', [
             'task' => $task,
@@ -50,11 +58,11 @@ class tasksController extends Controller
             'status' => 'required|max:10',   // add
             'content' => 'required|max:191',
         ]);
-
-        $task = new Tasks;
-        $task->content = $request->content;
-        $task->status = $request->status; 
-        $task->save();
+        
+        $request->user()->tasks()->create([
+            'content' => $request->content,
+            'status' => $request->status,
+        ]);
 
         return redirect('/');
     }
@@ -67,7 +75,7 @@ class tasksController extends Controller
      */
     public function show($id)
     {
-    $task = Tasks::find($id);
+    $task = Task::find($id);
 
         return view('tasks.show', [
             'task' => $task,
@@ -82,7 +90,7 @@ class tasksController extends Controller
      */
     public function edit($id)
     {
-        $task = Tasks::find($id);
+        $task = Task::find($id);
 
         return view('tasks.edit', [
             'task' => $task,
@@ -103,7 +111,7 @@ class tasksController extends Controller
             'content' => 'required|max:191',
         ]);
         
-        $task = Tasks::find($id);
+        $task = Task::find($id);
         $task->content = $request->content;
         $task->save();
 
@@ -118,7 +126,7 @@ class tasksController extends Controller
      */
      public function destroy($id)
     {
-        $task = Tasks::find($id);
+        $task = Task::find($id);
         $task->delete();
 
         return redirect('/');
