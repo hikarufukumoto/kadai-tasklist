@@ -75,19 +75,11 @@ class tasksController extends Controller
      */
     public function show($id)
     {
-    $data = [];
-        if (\Auth::check()) {
-            $user = \Auth::user();
-            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
+     $task = Task::find($id);
 
-            $data = [
-                'user' => $user,
-                'tasks' => $tasks,
-            ];
-            return view('tasks.show', $data);
-        }else {
-            return view('welcome');
-        }
+        return view('tasks.show', [
+            'task' => $task,
+        ]);
     }
 
     /**
