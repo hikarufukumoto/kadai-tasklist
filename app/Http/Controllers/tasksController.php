@@ -90,11 +90,19 @@ class tasksController extends Controller
      */
     public function edit($id)
     {
-        $task = Task::find($id);
+        $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('tasks.edit', [
-            'task' => $task,
-        ]);
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+            return view('tasks.edit', $data);
+        }else {
+            return view('welcome');
+        }
     }
 
     /**
