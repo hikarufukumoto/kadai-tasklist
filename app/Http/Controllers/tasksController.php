@@ -75,11 +75,19 @@ class tasksController extends Controller
      */
     public function show($id)
     {
-    $task = Task::find($id);
+    $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('tasks.show', [
-            'task' => $task,
-        ]);
+            $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+            return view('tasks.show', $data);
+        }else {
+            return view('welcome');
+        }
     }
 
     /**
@@ -134,9 +142,12 @@ class tasksController extends Controller
      */
      public function destroy($id)
     {
-        $task = Task::find($id);
-        $task->delete();
+         $micropost = \App\Task::find($id);
+         
+        if (\Auth::user()->id === $task->user_id) {
+            $task->delete();
+        }
 
-        return redirect('/');
+        return redirect()->back();
     }
 }
